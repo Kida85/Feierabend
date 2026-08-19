@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feierabend-Rechner</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 25px 15px;
+      overflow-x: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #6b3150;
+      background:
+        radial-gradient(circle at 15% 15%, #ffffff 0 4px, transparent 5px),
+        radial-gradient(circle at 85% 10%, #ffffff 0 3px, transparent 4px),
+        radial-gradient(circle at 75% 82%, #ffffff 0 5px, transparent 6px),
+        linear-gradient(135deg, #ffd9ea, #fce7f3, #e9d5ff);
+    }
+
+    .card {
+      width: min(100%, 500px);
+      position: relative;
+      padding: 34px 30px;
+      overflow: hidden;
+      border: 4px solid #ffffff;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 15px 35px rgba(219, 39, 119, 0.2);
+    }
+
+    .corner-decoration {
+      position: absolute;
+      opacity: 0.55;
+      font-size: 3rem;
+    }
+
+    .top-left {
+      top: 12px;
+      left: 16px;
+    }
+
+    .top-right {
+      top: 12px;
+      right: 16px;
+    }
+
+    h1 {
+      margin: 5px 0 8px;
+      color: #db2777;
+      font-size: clamp(1.8rem, 7vw, 2.5rem);
+      text-align: center;
+    }
+
+    .intro {
+      margin: 0 0 28px;
+      color: #a14c78;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .section-title {
+      display: block;
+      margin: 22px 0 10px;
+      color: #be185d;
+      font-weight: bold;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #9d174d;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 10px;
+      border: 2px solid #f9a8d4;
+      border-radius: 14px;
+      color: #6b3150;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-align: center;
+      background: #fff8fc;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #ec4899;
+      box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.16);
+    }
+
+    .hint {
+      margin: 7px 0 0;
+      color: #b76a90;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 28px;
+      padding: 15px;
+      border: 3px solid #ffffff;
+      border-radius: 16px;
+      color: white;
+      font-size: 1.05rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #f472b6, #db2777);
+      box-shadow: 0 6px 0 #be185d;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #be185d;
+    }
+
+    button:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #be185d;
+    }
+
+    .error {
+      min-height: 22px;
+      margin-top: 14px;
+      color: #e11d48;
+      font-size: 0.92rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 22px 16px;
+      border: 3px dashed #f472b6;
+      border-radius: 20px;
+      text-align: center;
+      background: linear-gradient(135deg, #fff1f7, #fdf4ff);
+    }
+
+    .result.visible {
+      display: block;
+      animation: popIn 0.35s ease;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.93);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .result p {
+      margin: 0 0 8px;
+      color: #a21c5b;
+      font-weight: bold;
+    }
+
+    .end-time {
+      margin: 7px 0;
+      color: #db2777;
+      font-size: clamp(2.5rem, 12vw, 4rem);
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .small-result {
+      margin-top: 10px !important;
+      color: #a76a86 !important;
+      font-size: 0.85rem;
+      font-weight: normal !important;
+    }
+
+    .countdown-box {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 15px;
+      color: #9d174d;
+      background: #ffe4f0;
+    }
+
+    .countdown-box span {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    #countdown {
+      color: #db2777;
+      font-size: 1.7rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .footer-hearts {
+      margin-top: 24px;
+      color: #f472b6;
+      letter-spacing: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <div class="corner-decoration top-left">🌸</div>
+    <div class="corner-decoration top-right">✨</div>
+
+    <h1>🩷 Feierabend-Rechner</h1>
+
+    <p class="intro">
+      Wann ist heute wohl Feierabend? Gib deine Zeiten ein und finde es heraus. ✨
+    </p>
+
+    <span class="section-title">
+      🕒 Arbeitsbeginn – 24-Stunden-Format
+    </span>
+
+    <div class="input-row">
+      <div>
+        <label for="startStunden">Stunden</label>
+        <input
+          id="startStunden"
+          type="number"
+          min="0"
+          max="23"
+          value="8"
+        >
+        <p class="hint">0 bis 23</p>
+      </div>
+
+      <div>
+        <label for="startMinuten">Minuten</label>
+        <input
+          id="startMinuten"
+          type="number"
+          min="0"
+          max="59"
+          value="0"
+        >
+        <p class="hint">0 bis 59</p>
+      </div>
+    </div>
+
+    <span class="section-title">💼 Arbeitszeit</span>
+
+    <div class="input-row">
+      <div>
+        <label for="arbeitsStunden">Stunden</label>
+        <input
+          id="arbeitsStunden"
+          type="number"
+          min="0"
+          max="24"
+          value="8"
+        >
+      </div>
+
+      <div>
+        <label for="arbeitsMinuten">Minuten</label>
+        <input
+          id="arbeitsMinuten"
+          type="number"
+          min="0"
+          max="59"
+          value="0"
+        >
+      </div>
+    </div>
+
+    <span class="section-title">☕ Pausenzeit</span>
+
+    <label for="pause" style="font-weight: normal; color: #a14c78;">
+      Pause in Minuten
+      <span style="font-size: 0.8rem;">(optional)</span>
+    </label>
+
+    <input
+      id="pause"
+      type="number"
+      min="0"
+      max="300"
+      value="0"
+    >
+
+    <button id="berechnenButton">
+      ✨ Feierabend berechnen ✨
+    </button>
+
+    <div class="error" id="fehler"></div>
+
+    <section class="result" id="ergebnis">
+      <p>Du könntest Feierabend machen um:</p>
+
+      <div class="end-time" id="feierabendZeit">
+        16:00
+      </div>
+
+      <p>Uhr 🎀</p>
+
+      <p class="small-result" id="zusatzInfo"></p>
+
+      <div class="countdown-box">
+        <span id="countdownLabel">Noch bis zum Feierabend:</span>
+        <div id="countdown">--:--:--</div>
+      </div>
+    </section>
+
+    <div class="footer-hearts">♥ ♥ ♥</div>
+  </main>
+
+  <script>
+    const startStundenInput = document.getElementById("startStunden");
+    const startMinutenInput = document.getElementById("startMinuten");
+
+    const arbeitsStundenInput = document.getElementById("arbeitsStunden");
+    const arbeitsMinutenInput = document.getElementById("arbeitsMinuten");
+
+    const pauseInput = document.getElementById("pause");
+
+    const berechnenButton = document.getElementById("berechnenButton");
+
+    const ergebnis = document.getElementById("ergebnis");
+    const feierabendZeit = document.getElementById("feierabendZeit");
+    const zusatzInfo = document.getElementById("zusatzInfo");
+    const fehler = document.getElementById("fehler");
+
+    const countdown = document.getElementById("countdown");
+    const countdownLabel = document.getElementById("countdownLabel");
+
+    let countdownTimer;
+    let feierabendDatum;
+
+    function zweiStellen(zahl) {
+      return String(zahl).padStart(2, "0");
+    }
+
+    function dauerFormatieren(milliseconds) {
+      const gesamtSekunden = Math.floor(milliseconds / 1000);
+
+      const stunden = Math.floor(gesamtSekunden / 3600);
+      const minuten = Math.floor((gesamtSekunden % 3600) / 60);
+      const sekunden = gesamtSekunden % 60;
+
+      return (
+        zweiStellen(stunden) +
+        ":" +
+        zweiStellen(minuten) +
+        ":" +
+        zweiStellen(sekunden)
+      );
+    }
+
+    function countdownAktualisieren() {
+      const jetzt = new Date();
+      const differenz = feierabendDatum - jetzt;
+
+      if (differenz <= 0) {
+        clearInterval(countdownTimer);
+
+        countdownLabel.textContent =
+          "Der errechnete Feierabend ist bereits vorbei:";
+
+        countdown.textContent = "🎉 YAY! 🎉";
+        return;
+      }
+
+      countdownLabel.textContent = "Noch bis zum Feierabend:";
+      countdown.textContent = dauerFormatieren(differenz);
+    }
+
+    function countdownStarten() {
+      // Alten Timer entfernen, damit kein zweiter Countdown parallel läuft.
+      clearInterval(countdownTimer);
+
+      countdownAktualisieren();
+
+      countdownTimer = setInterval(() => {
+        countdownAktualisieren();
+      }, 1000);
+    }
+
+    function feierabendBerechnen() {
+      const startStunden = Number(startStundenInput.value);
+      const startMinuten = Number(startMinutenInput.value);
+
+      const arbeitsStunden = Number(arbeitsStundenInput.value);
+      const arbeitsMinuten = Number(arbeitsMinutenInput.value);
+
+      const pause = Number(pauseInput.value);
+
+      // Falls gerade ein alter Countdown läuft, wird er beendet.
+      clearInterval(countdownTimer);
+
+      fehler.textContent = "";
+      ergebnis.classList.remove("visible");
+
+      const ungueltig =
+        startStundenInput.value === "" ||
+        startMinutenInput.value === "" ||
+        arbeitsStundenInput.value === "" ||
+        arbeitsMinutenInput.value === "" ||
+        pauseInput.value === "" ||
+        startStunden < 0 ||
+        startStunden > 23 ||
+        startMinuten < 0 ||
+        startMinuten > 59 ||
+        arbeitsStunden < 0 ||
+        arbeitsStunden > 24 ||
+        arbeitsMinuten < 0 ||
+        arbeitsMinuten > 59 ||
+        pause < 0;
+
+      if (ungueltig) {
+        fehler.textContent =
+          "Bitte gib gültige Uhrzeiten ein, cutie! 💕";
+
+        return;
+      }
+
+      // Alle Zeitwerte in Minuten umrechnen.
+      const arbeitsbeginnInMinuten =
+        startStunden * 60 + startMinuten;
+
+      const arbeitszeitInMinuten =
+        arbeitsStunden * 60 + arbeitsMinuten;
+
+      const feierabendInMinuten =
+        arbeitsbeginnInMinuten +
+        arbeitszeitInMinuten +
+        pause;
+
+      // Prüfen, ob der Feierabend rechnerisch am Folgetag liegt.
+      const naechsterTag =
+        feierabendInMinuten >= 24 * 60;
+
+      // Wieder in Stunden und Minuten umwandeln.
+      const endzeitHeute =
+        feierabendInMinuten % (24 * 60);
+
+      const endStunden = Math.floor(endzeitHeute / 60);
+      const endMinuten = endzeitHeute % 60;
+
+      feierabendZeit.textContent =
+        zweiStellen(endStunden) +
+        ":" +
+        zweiStellen(endMinuten);
+
+      // Das heutige Datum mit der berechneten Feierabendzeit kombinieren.
+      const heute = new Date();
+
+      feierabendDatum = new Date(
+        heute.getFullYear(),
+        heute.getMonth(),
+        heute.getDate(),
+        endStunden,
+        endMinuten,
+        0,
+        0
+      );
+
+      // Nur bei einer Schicht über Mitternacht wird der Folgetag gewählt.
+      if (naechsterTag) {
+        feierabendDatum.setDate(
+          feierabendDatum.getDate() + 1
+        );
+      }
+
+      let info =
+        "Start: " +
+        zweiStellen(startStunden) +
+        ":" +
+        zweiStellen(startMinuten) +
+        " Uhr · Arbeitszeit: " +
+        arbeitsStunden +
+        " Std. " +
+        arbeitsMinuten +
+        " Min.";
+
+      if (pause > 0) {
+        info += " · Pause: " + pause + " Min.";
+      }
+
+      if (naechsterTag) {
+        info += " · Feierabend am nächsten Tag 🌙";
+      }
+
+      zusatzInfo.textContent = info;
+
+      ergebnis.classList.add("visible");
+
+      // Countdown starten, nachdem das Feierabenddatum berechnet wurde.
+      countdownStarten();
+    }
+
+    berechnenButton.addEventListener("click", feierabendBerechnen);
+
+    // Berechnen mit Enter-Taste.
+    document.querySelectorAll("input").forEach(input => {
+      input.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          feierabendBerechnen();
+        }
+      });
+    });
+
+    // Beispiel direkt beim Öffnen berechnen.
+    feierabendBerechnen();
+  </script>
+</body>
+</html>
